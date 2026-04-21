@@ -404,15 +404,45 @@
 
     /* ══ RESPONSIVO ═════════════════════════════════════════════════════════════ */
     @media (max-width: 600px) {
+      body { font-size: 14px; }
+
+      /* Nav — scroll horizontal */
+      nav { padding: 0 8px; }
+      .nav-logo { font-size: .95rem; padding: 12px 0; flex-shrink: 0; }
+      .nav-tabs { overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; flex-shrink: 1; }
+      .nav-tabs::-webkit-scrollbar { display: none; }
+      .nav-tab { padding: 12px 10px; font-size: .76rem; white-space: nowrap; }
+
+      .tela { padding: 10px; }
       .dash-top { grid-template-columns: 1fr 1fr; }
       .kpi-ciclo { grid-column: 1 / -1; }
-      .merg-grid { grid-template-columns: repeat(2, 1fr); }
+      .merg-grid { grid-template-columns: repeat(3, 1fr); }
       .serv-grid { grid-template-columns: repeat(2, 1fr); }
-      .hora-row  { grid-template-columns: 1fr; }
-      .nav-tab   { padding: 13px 8px; font-size: .73rem; }
+      .hora-row  { grid-template-columns: 1fr 1fr; }
       .timer-disp { font-size: 1.8rem; }
-      .mapa-layout { grid-template-columns: 1fr 1fr; grid-template-areas: "sistema-c sistema-c" "sistema-a sistema-e" "sistema-b sistema-d" "sistema-f sistema-f"; }
       .graf-grid { grid-template-columns: 1fr; }
+
+      /* Inputs touch-friendly */
+      .hora-inner input { padding: 11px 10px; font-size: 1rem; min-height: 44px; }
+      .btn-agora { min-height: 44px; padding: 0 11px; font-size: .72rem; }
+      .btn-merg  { padding: 10px 4px; }
+      .btn-serv  { padding: 11px 6px; min-height: 44px; }
+      .btn-reg-main { padding: 16px; font-size: 1.05rem; min-height: 52px; }
+      textarea   { font-size: .95rem; }
+      .sem-box select { min-height: 44px; font-size: .95rem; }
+      input[type="date"] { min-height: 44px; font-size: 1rem; }
+
+      /* Mapa — escala para caber na tela */
+      .mapa-container { padding: 8px; overflow-x: auto; }
+      .mapa-planta { transform-origin: top left; }
+    }
+
+    @media (max-width: 420px) {
+      .mapa-planta {
+        transform: scale(0.78);
+        width: 390px; /* mantém largura lógica; container recalcula com height */
+        margin-bottom: calc(-535px * 0.22); /* compensa altura encurtada */
+      }
     }
   </style>
 </head>
@@ -579,6 +609,12 @@
       <button class="btn-serv" onclick="selServ(this,'Cenografia')">🪨 Cenografia</button>
       <button class="btn-serv" onclick="selServ(this,'Aeração-Técnico')">⚙️ Aeração-Téc.</button>
     </div>
+  </div>
+
+  <!-- Data -->
+  <div class="form-sec">
+    <div class="form-tit">Data</div>
+    <input type="date" id="f-data" style="width:100%;padding:9px 11px;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;color:var(--txt);font-family:inherit;font-size:.95rem;"/>
   </div>
 
   <!-- Horários -->
@@ -895,7 +931,17 @@ function distribuir(aqs,tot,sis){
 
 // ── FORMULÁRIO MANUAL ─────────────────────────────────────────────────────────
 function selMerg(nome,btn){ E.mergulhador=nome; document.querySelectorAll('.btn-merg').forEach(b=>b.classList.remove('sel')); btn.classList.add('sel'); }
-function selAq(n,s){ document.querySelectorAll('.tk').forEach(t=>t.classList.remove('sel')); document.getElementById('t'+n)?.classList.add('sel'); E.aquario=n; E.sistema=s; calcDur(); }
+function selAq(n,s){
+  document.querySelectorAll('.tk').forEach(t=>t.classList.remove('sel'));
+  if(['A','E'].includes(s)){
+    (SISTEMAS[s]||[]).forEach(x=>document.getElementById('t'+x)?.classList.add('sel'));
+    E.aquario=n; E.sistema=s;
+  } else {
+    document.getElementById('t'+n)?.classList.add('sel');
+    E.aquario=n; E.sistema=s;
+  }
+  calcDur();
+}
 function selServ(btn,s){ E.servico=s; document.querySelectorAll('.btn-serv').forEach(b=>b.classList.remove('sel')); btn.classList.add('sel'); }
 function agora(id){ document.getElementById(id).value=new Date().toTimeString().substring(0,5); calcDur(); }
 
@@ -928,7 +974,9 @@ async function salvar(){
   const e=document.getElementById('f-entrada').value, s=document.getElementById('f-saida').value;
   const [hE,mE]=e.split(':').map(Number),[hS,mS]=s.split(':').map(Number);
   const min=Math.max(0,(hS*60+mS)-(hE*60+mE));
-  const obs=document.getElementById('f-obs').value, data=new Date().toLocaleDateString('pt-BR');
+  const obs=document.getElementById('f-obs').value;
+  const dataRaw=document.getElementById('f-data').value;
+  const data=dataRaw ? dataRaw.split('-').reverse().join('/') : new Date().toLocaleDateString('pt-BR');
   try {
     if(['A','E'].includes(E.sistema)){
       const lote=distribuir(SISTEMAS[E.sistema],min,E.sistema).map(it=>({
@@ -966,7 +1014,7 @@ async function salvarSemMergulho(){
   try {
     const r=await fetch('/api/registros',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
       mergulhador:merg,aquario:'—',sistema:'—',servico:'—',horaEntrada:'',horaSaida:'',
-      status:'Sem Mergulho',motivoPausa:motivo,data:new Date().toLocaleDateString('pt-BR')
+      status:'Sem Mergulho',motivoPausa:motivo,data:(()=>{const v=document.getElementById('f-data').value;return v?v.split('-').reverse().join('/'):new Date().toLocaleDateString('pt-BR');})()
     })}).then(x=>x.json());
     if(r.erro) throw new Error(r.erro);
     ok.textContent='✅ Pausa registrada!'; ok.style.display='block';
@@ -1005,6 +1053,7 @@ banner();
 carregarDash();
 montarTimers();
 marcarHoje();
+document.getElementById('f-data').value = new Date().toISOString().slice(0,10);
 </script>
 </body>
 </html>
