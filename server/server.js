@@ -1,44 +1,50 @@
 // server.js — Tanaka-Sub v3
-// Banco de dados: aba "Registros" — 100% sem leitura de "Operação"
-
 require('dotenv').config({ path: require('path').join(__dirname, '../.env') });
 const express = require('express');
 const cors    = require('cors');
 const path    = require('path');
 const { google } = require('googleapis');
 
-// 1. Tenta pegar a chave da variável de ambiente (Render) ou do arquivo local
+// 1. Carregamento seguro das credenciais
 let credentials;
 try {
   if (process.env.GOOGLE_CREDENTIALS) {
-    // O .trim() remove espaços que causam o erro de Syntax no JSON
     credentials = JSON.parse(process.env.GOOGLE_CREDENTIALS.trim());
   } else {
-    credentials = require('./google-key.json'); // Ajuste o nome se for outro
+    // Certifique-se que o arquivo google-key.json está na mesma pasta que o server.js
+    credentials = require('./google-key.json'); 
   }
 } catch (err) {
   console.error("❌ Erro ao carregar credenciais:", err.message);
 }
 
-// 2. Cria a variável 'auth' que o seu código estava reclamando que não existia
+// 2. Configuração da Autenticação
 const auth = new google.auth.GoogleAuth({
   credentials,
   scopes: ['https://www.googleapis.com/auth/spreadsheets'],
 });
 
-// 3. Agora o 'auth' está definido e não vai dar mais ReferenceError
+// 3. Inicialização do Sheets (APENAS UMA VEZ)
 const sheets = google.sheets({ version: 'v4', auth });
 
 console.log("✅ Conexão com Google Sheets preparada!");
 
-const sheets = google.sheets({ version: 'v4', auth });
-
+// 4. Configuração do Express
 const app  = express();
-const PORT = process.env.PORT || 3002;
+const PORT = process.env.PORT || 10000; // Render usa portas dinâmicas, 10000 é o padrão deles
 
 app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '../public')));
+
+// Seu ID da planilha (Tanaka Sports)
+const SPREADSHEET_ID = '16y-AmjOYbgUON0FzWzxxJFlyZOzTHa6S8ieeZ0EVVJI';
+
+// ... resto das suas rotas (app.get, app.post ...)
+
+app.listen(PORT, () => {
+  console.log(`🚀 Servidor rodando na porta ${PORT}`);
+});
 // ========== GERENCIADOR MATTEUS-SUB ==========
 // Endpoint para o Manager (health check + controle)
 app.get('/ping', (req, res) => {
