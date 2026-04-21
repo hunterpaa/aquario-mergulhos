@@ -6,6 +6,18 @@ const express = require('express');
 const cors    = require('cors');
 const path    = require('path');
 const { google } = require('googleapis');
+// Ele tenta ler da variável do Render primeiro. 
+// Se não existir (rodando local), ele tenta ler o arquivo credentials.json
+const credentials = process.env.GOOGLE_CREDENTIALS 
+  ? JSON.parse(process.env.GOOGLE_CREDENTIALS) 
+  : require('./credentials.json');
+
+const auth = new google.auth.GoogleAuth({
+  credentials,
+  scopes: ['https://www.googleapis.com/auth/spreadsheets'],
+});
+
+const sheets = google.sheets({ version: 'v4', auth });
 
 const app  = express();
 const PORT = process.env.PORT || 3002;
