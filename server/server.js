@@ -7,6 +7,29 @@ const cors    = require('cors');
 const path    = require('path');
 const { google } = require('googleapis');
 
+// 1. Tenta pegar a chave da variável de ambiente (Render) ou do arquivo local
+let credentials;
+try {
+  if (process.env.GOOGLE_CREDENTIALS) {
+    // O .trim() remove espaços que causam o erro de Syntax no JSON
+    credentials = JSON.parse(process.env.GOOGLE_CREDENTIALS.trim());
+  } else {
+    credentials = require('./google-key.json'); // Ajuste o nome se for outro
+  }
+} catch (err) {
+  console.error("❌ Erro ao carregar credenciais:", err.message);
+}
+
+// 2. Cria a variável 'auth' que o seu código estava reclamando que não existia
+const auth = new google.auth.GoogleAuth({
+  credentials,
+  scopes: ['https://www.googleapis.com/auth/spreadsheets'],
+});
+
+// 3. Agora o 'auth' está definido e não vai dar mais ReferenceError
+const sheets = google.sheets({ version: 'v4', auth });
+
+console.log("✅ Conexão com Google Sheets preparada!");
 
 const sheets = google.sheets({ version: 'v4', auth });
 
