@@ -1,18 +1,50 @@
 // server.js — Tanaka-Sub v3
-// Banco de dados: aba "Registros" — 100% sem leitura de "Operação"
-
 require('dotenv').config({ path: require('path').join(__dirname, '../.env') });
 const express = require('express');
 const cors    = require('cors');
 const path    = require('path');
 const { google } = require('googleapis');
 
+// 1. Carregamento seguro das credenciais
+let credentials;
+try {
+  if (process.env.GOOGLE_CREDENTIALS) {
+    credentials = JSON.parse(process.env.GOOGLE_CREDENTIALS.trim());
+  } else {
+    // Certifique-se que o arquivo google-key.json está na mesma pasta que o server.js
+    credentials = require('./google-key.json'); 
+  }
+} catch (err) {
+  console.error("❌ Erro ao carregar credenciais:", err.message);
+}
+
+// 2. Configuração da Autenticação
+const auth = new google.auth.GoogleAuth({
+  credentials,
+  scopes: ['https://www.googleapis.com/auth/spreadsheets'],
+});
+
+// 3. Inicialização do Sheets (APENAS UMA VEZ)
+const sheets = google.sheets({ version: 'v4', auth });
+
+console.log("✅ Conexão com Google Sheets preparada!");
+
+// 4. Configuração do Express
 const app  = express();
 const PORT = process.env.PORT || 10000;
 
 app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '../public')));
+
+// Seu ID da planilha (Tanaka Sports)
+const SPREADSHEET_ID = '16y-AmjOYbgUON0FzWzxxJFlyZOzTHa6S8ieeZ0EVVJI';
+
+// ... resto das suas rotas (app.get, app.post ...)
+
+app.listen(PORT, () => {
+  console.log(`🚀 Servidor rodando na porta ${PORT}`);
+});
 // ========== GERENCIADOR MATTEUS-SUB ==========
 // Endpoint para o Manager (health check + controle)
 app.get('/ping', (req, res) => {
