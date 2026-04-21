@@ -48,6 +48,14 @@ app.get('/logs/stream', (req, res) => {
 // ========== FIM GERENCIADOR ==========
 // ─── AUTH ──────────────────────────────────────────────────────────────────────
 function getAuth() {
+  if (process.env.GOOGLE_CREDENTIALS) {
+    const creds = JSON.parse(process.env.GOOGLE_CREDENTIALS);
+    return new google.auth.JWT({
+      email: creds.client_email,
+      key: creds.private_key,
+      scopes: ['https://www.googleapis.com/auth/spreadsheets'],
+    });
+  }
   return new google.auth.JWT({
     keyFile: path.join(__dirname, 'google-key.json'),
     scopes: ['https://www.googleapis.com/auth/spreadsheets'],
