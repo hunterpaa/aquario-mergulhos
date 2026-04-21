@@ -290,7 +290,7 @@
     .btn-merg.sel { border-color: var(--neon); background: rgba(0,230,118,.07); }
     .btn-merg.sel span { color: var(--neon); }
 
-    /* ══ MAPA DE TANQUES — CSS GRID ═════════════════════════════════════════════ */
+    /* ══ MAPA DE TANQUES — ABSOLUTO ════════════════════════════════════════════ */
     .mapa-container {
       background: var(--bg2);
       border: 1px solid var(--border);
@@ -300,82 +300,37 @@
     }
     .mapa-hint { font-size:.72rem; color:var(--txt3); text-align:center; margin-top:6px; }
 
-    /* Layout principal do mapa */
-    .mapa-layout {
-      display: grid;
-      grid-template-areas:
-        "sistema-c sistema-c sistema-c sistema-c"
-        "sistema-a sistema-b sistema-d sistema-e"
-        "vazio     sistema-f sistema-f vazio2";
-      grid-template-columns: 1fr 1.2fr 1.2fr 1fr;
-      grid-template-rows: auto auto auto;
-      gap: 8px;
-      min-width: 300px;
+    .mapa-planta {
+      position: relative;
+      width: 390px;
+      height: 535px;
+      margin: 0 auto;
     }
-    .sis-bloco {
-      border-radius: 10px;
-      padding: 9px;
-      display: flex;
-      flex-direction: column;
-      gap: 5px;
-    }
-    .sis-bloco.sis-a  { grid-area: sistema-a;  background: var(--a-bg); border: 1px solid rgba(41,121,255,.2); }
-    .sis-bloco.sis-b  { grid-area: sistema-b;  background: var(--b-bg); border: 1px solid rgba(0,230,118,.2); }
-    .sis-bloco.sis-c  { grid-area: sistema-c;  background: var(--c-bg); border: 1px solid rgba(255,152,0,.2); }
-    .sis-bloco.sis-d  { grid-area: sistema-d;  background: var(--d-bg); border: 1px solid rgba(124,77,255,.2); }
-    .sis-bloco.sis-e  { grid-area: sistema-e;  background: var(--e-bg); border: 1px solid rgba(240,98,146,.2); }
-    .sis-bloco.sis-f  { grid-area: sistema-f;  background: var(--f-bg); border: 1px solid rgba(255,82,82,.2); }
-    .vazio             { grid-area: vazio; }
-    .vazio2            { grid-area: vazio2; }
 
-    .sis-c { flex-direction: row; align-items: center; }
-    .sis-c .tanks { flex-direction: row; flex: 1; justify-content: center; }
-
-    .sis-nome {
-      font-size: .68rem;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: .5px;
-      margin-bottom: 2px;
-    }
-    .sis-a .sis-nome { color: var(--a-tx); }
-    .sis-b .sis-nome { color: var(--b-tx); }
-    .sis-c .sis-nome { color: var(--c-tx); margin-bottom: 0; margin-right: 8px; }
-    .sis-d .sis-nome { color: var(--d-tx); }
-    .sis-e .sis-nome { color: var(--e-tx); }
-    .sis-f .sis-nome { color: var(--f-tx); }
-
-    .tanks { display: flex; gap: 4px; }
-    .tanks-col { flex-direction: column; }
-    .tanks-row { flex-direction: row; flex-wrap: wrap; }
-
-    /* Tank button */
-    .tank {
+    .tk {
+      position: absolute;
       border: none;
-      border-radius: 7px;
+      border-radius: 6px;
       font-family: inherit;
       font-weight: 700;
-      font-size: .8rem;
+      font-size: .82rem;
       cursor: pointer;
       transition: .12s;
       display: flex;
       align-items: center;
       justify-content: center;
-      min-width: 32px;
-      min-height: 32px;
-      flex: 1;
+      line-height: 1;
     }
-    .sis-a .tank { background: rgba(41,121,255,.25);  color: var(--a-tx); }
-    .sis-b .tank { background: rgba(0,230,118,.2);    color: var(--b-tx); }
-    .sis-c .tank { background: rgba(255,152,0,.2);    color: var(--c-tx); min-width: 80px; min-height: 38px; font-size: .9rem; }
-    .sis-d .tank { background: rgba(124,77,255,.22);  color: var(--d-tx); }
-    .sis-e .tank { background: rgba(240,98,146,.2);   color: var(--e-tx); }
-    .sis-f .tank { background: rgba(255,82,82,.18);   color: var(--f-tx); }
+    .tk:hover { filter: brightness(1.25); transform: scale(1.04); }
+    .tk.sel   { outline: 3px solid var(--neon); filter: brightness(1.35); }
+    .tk.hoje  { box-shadow: 0 0 0 3px var(--neon); }
 
-    .tank.grande { min-height: 52px; }
-    .tank:hover  { filter: brightness(1.35); }
-    .tank.sel    { outline: 2px solid var(--neon); filter: brightness(1.4); }
-    .tank.hoje   { box-shadow: 0 0 0 2px var(--neon); }
+    .tk-a { background: #757575; color: #fff; }
+    .tk-b { background: #6a1fb5; color: #fff; }
+    .tk-c { background: #f9a825; color: #111; }
+    .tk-d { background: #2e7d32; color: #fff; }
+    .tk-e { background: #c62828; color: #fff; }
+    .tk-f { background: #0097a7; color: #fff; }
 
     /* ══ SERVIÇOS ═══════════════════════════════════════════════════════════════ */
     .serv-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; }
@@ -568,84 +523,46 @@
     </div>
   </div>
 
-  <!-- Mapa CSS Grid -->
+  <!-- Mapa Absoluto -->
   <div class="form-sec">
     <div class="form-tit">Tanque</div>
     <div class="mapa-container">
-      <div class="mapa-layout">
+      <div class="mapa-planta">
 
-        <!-- Sistema C — topo -->
-        <div class="sis-bloco sis-c">
-          <div class="sis-nome">C</div>
-          <div class="tanks">
-            <button class="tank" id="t9" onclick="selAq(9,'C')">9</button>
-          </div>
-        </div>
+        <!-- SSV C (amarelo) -->
+        <button class="tk tk-c" id="t9"  onclick="selAq(9,'C')"  style="left:100px;top:5px;width:150px;height:40px">9</button>
 
-        <!-- Sistema A — coluna esquerda -->
-        <div class="sis-bloco sis-a">
-          <div class="sis-nome">A</div>
-          <div class="tanks tanks-col">
-            <button class="tank" id="t1" onclick="selAq(1,'A')">1</button>
-            <button class="tank" id="t2" onclick="selAq(2,'A')">2</button>
-            <button class="tank" id="t4" onclick="selAq(4,'A')">4</button>
-            <button class="tank" id="t5" onclick="selAq(5,'A')">5</button>
-            <button class="tank" id="t3" onclick="selAq(3,'A')">3</button>
-          </div>
-        </div>
+        <!-- SSV D (verde) -->
+        <button class="tk tk-d" id="t10" onclick="selAq(10,'D')" style="left:100px;top:50px;width:48px;height:135px">10</button>
+        <button class="tk tk-d" id="t11" onclick="selAq(11,'D')" style="left:100px;top:190px;width:48px;height:70px">11</button>
+        <button class="tk tk-d" id="t12" onclick="selAq(12,'D')" style="left:100px;top:265px;width:82px;height:42px">12</button>
 
-        <!-- Sistema B — centro esquerdo -->
-        <div class="sis-bloco sis-b">
-          <div class="sis-nome">B</div>
-          <div class="tanks tanks-col">
-            <button class="tank grande" id="t8" onclick="selAq(8,'B')">8</button>
-            <div class="tanks tanks-row">
-              <button class="tank" id="t6" onclick="selAq(6,'B')">6</button>
-              <button class="tank" id="t7" onclick="selAq(7,'B')">7</button>
-            </div>
-          </div>
-        </div>
+        <!-- SSV B (roxo) -->
+        <button class="tk tk-b" id="t8"  onclick="selAq(8,'B')"  style="left:235px;top:50px;width:48px;height:135px">8</button>
+        <button class="tk tk-b" id="t7"  onclick="selAq(7,'B')"  style="left:235px;top:190px;width:48px;height:70px">7</button>
+        <button class="tk tk-b" id="t6"  onclick="selAq(6,'B')"  style="left:201px;top:265px;width:82px;height:42px">6</button>
 
-        <!-- Sistema D — centro direito -->
-        <div class="sis-bloco sis-d">
-          <div class="sis-nome">D</div>
-          <div class="tanks tanks-col">
-            <button class="tank grande" id="t10" onclick="selAq(10,'D')">10</button>
-            <div class="tanks tanks-row">
-              <button class="tank" id="t11" onclick="selAq(11,'D')">11</button>
-              <button class="tank" id="t12" onclick="selAq(12,'D')">12</button>
-            </div>
-          </div>
-        </div>
+        <!-- SSV E (vermelho) -->
+        <button class="tk tk-e" id="t13" onclick="selAq(13,'E')" style="left:100px;top:312px;width:48px;height:38px">13</button>
+        <button class="tk tk-e" id="t14" onclick="selAq(14,'E')" style="left:100px;top:354px;width:48px;height:38px">14</button>
+        <button class="tk tk-e" id="t15" onclick="selAq(15,'E')" style="left:100px;top:396px;width:48px;height:38px">15</button>
+        <button class="tk tk-e" id="t16" onclick="selAq(16,'E')" style="left:100px;top:438px;width:48px;height:38px">16</button>
+        <button class="tk tk-e" id="t17" onclick="selAq(17,'E')" style="left:100px;top:480px;width:48px;height:38px">17</button>
 
-        <!-- Sistema E — coluna direita -->
-        <div class="sis-bloco sis-e">
-          <div class="sis-nome">E</div>
-          <div class="tanks tanks-col">
-            <button class="tank" id="t13" onclick="selAq(13,'E')">13</button>
-            <button class="tank" id="t14" onclick="selAq(14,'E')">14</button>
-            <button class="tank" id="t16" onclick="selAq(16,'E')">16</button>
-            <button class="tank" id="t17" onclick="selAq(17,'E')">17</button>
-            <button class="tank" id="t15" onclick="selAq(15,'E')">15</button>
-          </div>
-        </div>
+        <!-- SSV A (cinza) -->
+        <button class="tk tk-a" id="t5"  onclick="selAq(5,'A')"  style="left:235px;top:312px;width:48px;height:38px">5</button>
+        <button class="tk tk-a" id="t4"  onclick="selAq(4,'A')"  style="left:235px;top:354px;width:48px;height:38px">4</button>
+        <button class="tk tk-a" id="t3"  onclick="selAq(3,'A')"  style="left:235px;top:396px;width:48px;height:38px">3</button>
+        <button class="tk tk-a" id="t2"  onclick="selAq(2,'A')"  style="left:235px;top:438px;width:48px;height:38px">2</button>
+        <button class="tk tk-a" id="t1"  onclick="selAq(1,'A')"  style="left:235px;top:480px;width:48px;height:38px">1</button>
 
-        <!-- vazio -->
-        <div class="vazio"></div>
+        <!-- SSV F (ciano) — forma U -->
+        <button class="tk tk-f" id="t20" onclick="selAq(20,'F')" style="left:155px;top:375px;width:73px;height:38px">20</button>
+        <button class="tk tk-f" id="t21" onclick="selAq(21,'F')" style="left:155px;top:417px;width:33px;height:38px">21</button>
+        <button class="tk tk-f" id="t19" onclick="selAq(19,'F')" style="left:195px;top:417px;width:33px;height:38px">19</button>
+        <button class="tk tk-f" id="t22" onclick="selAq(22,'F')" style="left:155px;top:459px;width:33px;height:38px">22</button>
+        <button class="tk tk-f" id="t18" onclick="selAq(18,'F')" style="left:195px;top:459px;width:33px;height:38px">18</button>
 
-        <!-- Sistema F — base central -->
-        <div class="sis-bloco sis-f">
-          <div class="sis-nome">F</div>
-          <div class="tanks tanks-row">
-            <button class="tank" id="t20" onclick="selAq(20,'F')">20</button>
-            <button class="tank" id="t22" onclick="selAq(22,'F')">22</button>
-            <button class="tank" id="t18" onclick="selAq(18,'F')">18</button>
-            <button class="tank" id="t19" onclick="selAq(19,'F')">19</button>
-            <button class="tank" id="t21" onclick="selAq(21,'F')">21</button>
-          </div>
-        </div>
-
-        <div class="vazio2"></div>
       </div>
     </div>
     <p class="mapa-hint">Borda verde = programado hoje · Toque para selecionar</p>
@@ -808,7 +725,7 @@ function banner() {
 function marcarHoje() {
   const dia = new Date().getDay();
   const sis = CRONOGRAMA[dia]||[];
-  document.querySelectorAll('.tank').forEach(t => t.classList.remove('hoje'));
+  document.querySelectorAll('.tk').forEach(t => t.classList.remove('hoje'));
   sis.flatMap(s => SISTEMAS[s]||[]).forEach(n => document.getElementById('t'+n)?.classList.add('hoje'));
 }
 
@@ -978,7 +895,7 @@ function distribuir(aqs,tot,sis){
 
 // ── FORMULÁRIO MANUAL ─────────────────────────────────────────────────────────
 function selMerg(nome,btn){ E.mergulhador=nome; document.querySelectorAll('.btn-merg').forEach(b=>b.classList.remove('sel')); btn.classList.add('sel'); }
-function selAq(n,s){ document.querySelectorAll('.tank').forEach(t=>t.classList.remove('sel')); document.getElementById('t'+n)?.classList.add('sel'); E.aquario=n; E.sistema=s; calcDur(); }
+function selAq(n,s){ document.querySelectorAll('.tk').forEach(t=>t.classList.remove('sel')); document.getElementById('t'+n)?.classList.add('sel'); E.aquario=n; E.sistema=s; calcDur(); }
 function selServ(btn,s){ E.servico=s; document.querySelectorAll('.btn-serv').forEach(b=>b.classList.remove('sel')); btn.classList.add('sel'); }
 function agora(id){ document.getElementById(id).value=new Date().toTimeString().substring(0,5); calcDur(); }
 
@@ -1030,7 +947,7 @@ async function salvar(){
       ok.textContent=`✅ Registrado! ${min}min — Tanque ${E.aquario}`;
     }
     ok.style.display='block';
-    document.querySelectorAll('.btn-merg,.btn-serv,.tank').forEach(el=>el.classList.remove('sel'));
+    document.querySelectorAll('.btn-merg,.btn-serv,.tk').forEach(el=>el.classList.remove('sel'));
     ['f-entrada','f-saida'].forEach(id=>document.getElementById(id).value='');
     document.getElementById('f-obs').value=''; document.getElementById('f-dur').textContent='—';
     document.getElementById('sec-dist').style.display='none';
