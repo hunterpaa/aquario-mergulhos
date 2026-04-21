@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Tanaka-Sub</title>
+  <title>Matteus-Sub</title>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
   <style>
@@ -185,7 +185,7 @@
     /* ══ GRÁFICOS ═══════════════════════════════════════════════════════════════ */
     .graf-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px; }
     .barra-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
-    .barra-lbl { width: 70px; font-size: .74rem; color: var(--txt2); text-align: right; }
+    .barra-lbl { width: 82px; font-size: .74rem; color: var(--txt2); text-align: right; }
     .barra-track-d { flex:1; height:18px; background:rgba(255,255,255,.05); border-radius:5px; overflow:hidden; }
     .barra-fill-d  { height:100%; border-radius:5px; display:flex; align-items:center; padding-left:6px; font-size:.68rem; font-weight:700; min-width:4px; transition:width .6s; }
     .barra-val { width: 46px; font-size: .74rem; font-weight: 600; color: var(--txt); text-align: right; }
@@ -272,7 +272,7 @@
     .form-sec { margin-bottom: 16px; }
     .form-tit { font-weight: 700; margin-bottom: 9px; font-size: .85rem; color: var(--txt2); text-transform: uppercase; letter-spacing: .4px; }
 
-    .merg-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+    .merg-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
     .btn-merg {
       background: var(--bg3);
       border: 1px solid var(--border);
@@ -446,14 +446,6 @@
     .filtros-row { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
     .filtros-row select { padding: 7px 10px; background: var(--card); border: 1px solid var(--border); border-radius: 8px; color: var(--txt); font-family: inherit; font-size: .82rem; }
 
-    /* ══ MIGRAÇÃO ═══════════════════════════════════════════════════════════════ */
-    .mig-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--raio); padding: 18px; margin-bottom: 14px; }
-    .mig-card h3 { color: var(--txt); margin-bottom: 10px; }
-    .mig-card p  { font-size: .84rem; color: var(--txt2); line-height: 1.55; margin-bottom: 10px; }
-    .btn-mig { padding: 10px 18px; border: none; border-radius: 8px; font-family: inherit; font-size: .88rem; font-weight: 700; cursor: pointer; transition: .15s; }
-    .btn-mig-prev { background: rgba(79,195,247,.15); color: var(--blue); border: 1px solid rgba(79,195,247,.3); }
-    .btn-mig-exec { background: rgba(0,230,118,.15); color: var(--neon); border: 1px solid rgba(0,230,118,.3); }
-    .pre-code { background: #020c18; border: 1px solid var(--border); color: #86efac; padding: 12px; border-radius: 8px; font-size: .74rem; overflow-x: auto; margin-top: 10px; white-space: pre-wrap; word-break: break-all; max-height: 300px; overflow-y: auto; }
 
     /* ══ RESPONSIVO ═════════════════════════════════════════════════════════════ */
     @media (max-width: 600px) {
@@ -472,13 +464,12 @@
 <body>
 
 <nav>
-  <div class="nav-logo">🤿 Tanaka-Sub</div>
+  <div class="nav-logo">🤿 Matteus-Sub</div>
   <div class="nav-tabs">
     <button class="nav-tab ativo" onclick="ir('dashboard')">Dashboard</button>
     <button class="nav-tab"       onclick="ir('cronometro')">Cronômetro</button>
     <button class="nav-tab"       onclick="ir('registrar')">Registrar</button>
     <button class="nav-tab"       onclick="ir('historico')">Histórico</button>
-    <button class="nav-tab"       onclick="ir('migrar')">Migrar</button>
   </div>
 </nav>
 
@@ -573,9 +564,6 @@
       </button>
       <button class="btn-merg" onclick="selMerg('Danilo',this)">
         <div class="avatar av-d">DA</div><span>Danilo</span>
-      </button>
-      <button class="btn-merg" onclick="selMerg('Matteus',this)">
-        <div class="avatar av-m">MA</div><span>Matteus</span>
       </button>
     </div>
   </div>
@@ -722,7 +710,7 @@
       <select id="sm-merg">
         <option value="">Selecione...</option>
         <option>Leonardo</option><option>Kelvin</option>
-        <option>Danilo</option><option>Matteus</option>
+        <option>Danilo</option>
       </select>
     </div>
     <div style="margin-bottom:8px">
@@ -742,7 +730,7 @@
     <select id="fil-merg" onchange="filtrar()">
       <option value="">Todos</option>
       <option>Leonardo</option><option>Kelvin</option>
-      <option>Danilo</option><option>Matteus</option>
+      <option>Danilo</option>
     </select>
     <select id="fil-sis" onchange="filtrar()">
       <option value="">Todos sistemas</option>
@@ -765,19 +753,6 @@
   </div>
 </div>
 
-<!-- ══════════════════════════ MIGRAR ══════════════════════════ -->
-<div id="tela-migrar" class="tela">
-  <div class="banner"><span>🔄</span> Migração de Dados</div>
-  <div class="mig-card">
-    <h3>Migrar aba Operação → Registros</h3>
-    <p>Lê dados da aba <strong>Operação</strong> a partir da linha 15 e copia para <strong>Registros</strong> no novo formato. A aba Operação não é modificada. Nomes como "Matteu" são corrigidos automaticamente para "Matteus".</p>
-    <div style="display:flex;gap:8px;flex-wrap:wrap">
-      <button class="btn-mig btn-mig-prev" onclick="migPreview()">👁 Ver prévia</button>
-      <button class="btn-mig btn-mig-exec" id="btn-exec" style="display:none" onclick="migExecutar()">✅ Executar migração</button>
-    </div>
-    <pre id="mig-json" class="pre-code" style="display:none"></pre>
-  </div>
-</div>
 
 <!-- ══════════════════════════ JS ══════════════════════════ -->
 <script>
@@ -796,20 +771,20 @@ const GRUPOS = {
   E:[{label:'E — todos (13→14→16→17→15)',aquarios:[13,14,15,16,17]}],
   F:[{label:'F — Tanques 20+22',aquarios:[20,22]},{label:'F — Tanques 18+19+21',aquarios:[18,19,21]}],
 };
-const AV_CLS = { Leonardo:'av-l', Kelvin:'av-k', Danilo:'av-d', Matteus:'av-m' };
-const AV_INI = { Leonardo:'LE', Kelvin:'KE', Danilo:'DA', Matteus:'MA' };
+const AV_CLS = { Leonardo:'av-l', Kelvin:'av-k', Danilo:'av-d' };
+const AV_INI = { Leonardo:'LE', Kelvin:'KE', Danilo:'DA' };
 const SIS_CORES = {
   A:'rgba(41,121,255,.7)', B:'rgba(0,230,118,.7)', C:'rgba(255,152,0,.7)',
   D:'rgba(124,77,255,.7)', E:'rgba(240,98,146,.7)', F:'rgba(255,82,82,.7)'
 };
-const MERG_CORES = { Leonardo:'#4fc3f7', Kelvin:'#66bb6a', Danilo:'#ffa726', Matteus:'#ce93d8' };
+const MERG_CORES = { Leonardo:'#4fc3f7', Kelvin:'#66bb6a', Danilo:'#ffa726' };
 
 // ── NAV ────────────────────────────────────────────────────────────────────────
 function ir(tela) {
   document.querySelectorAll('.tela').forEach(t=>t.classList.remove('ativa'));
   document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('ativo'));
   document.getElementById('tela-'+tela).classList.add('ativa');
-  ['dashboard','cronometro','registrar','historico','migrar']
+  ['dashboard','cronometro','registrar','historico']
     .forEach((t,i) => { if(t===tela) document.querySelectorAll('.nav-tab')[i]?.classList.add('ativo'); });
   if (tela==='dashboard')  carregarDash();
   if (tela==='cronometro') { banner(); montarTimers(); }
@@ -866,13 +841,13 @@ async function carregarDash() {
     document.getElementById('est-falt').textContent  = e.hParaProx60.toFixed(1);
 
     // Gráfico mergulhadores
-    const nomes = ['Leonardo','Kelvin','Danilo','Matteus'];
+    const nomes = ['Leonardo','Kelvin','Danilo'];
     const maxM  = Math.max(1,...nomes.map(n=>d.horasPorMergulhador[n]||0));
     document.getElementById('graf-merg').innerHTML = nomes.map(n => {
       const h = d.horasPorMergulhador[n]||0;
       const p = (h/maxM*100).toFixed(1);
       return `<div class="barra-row">
-        <div class="barra-lbl">${n.substring(0,6)}</div>
+        <div class="barra-lbl">${n}</div>
         <div class="barra-track-d"><div class="barra-fill-d" style="width:${p}%;background:${MERG_CORES[n]||'#4fc3f7'}">${h>0?h.toFixed(1)+'h':''}</div></div>
         <div class="barra-val">${h.toFixed(1)}h</div></div>`;
     }).join('');
@@ -919,7 +894,7 @@ function montarTimers() {
 
   const merg = [
     {n:'Leonardo',av:'LE',c:'av-l'},{n:'Kelvin',av:'KE',c:'av-k'},
-    {n:'Danilo',  av:'DA',c:'av-d'},{n:'Matteus',av:'MA',c:'av-m'},
+    {n:'Danilo',  av:'DA',c:'av-d'},
   ];
   document.getElementById('timers-grid').innerHTML = merg.map(m=>{
     const k=m.n.toLowerCase();
@@ -1107,22 +1082,6 @@ function filtrar(){
     : '<tr><td colspan="10" style="text-align:center;color:var(--txt3);padding:20px">Nenhum registro</td></tr>';
 }
 
-// ── MIGRAÇÃO ──────────────────────────────────────────────────────────────────
-async function migPreview(){
-  const jel=document.getElementById('mig-json'); jel.style.display='block'; jel.textContent='Carregando...';
-  try {
-    const d=await fetch('/api/migrar/preview').then(r=>r.json());
-    jel.textContent=JSON.stringify(d,null,2);
-    document.getElementById('btn-exec').style.display='inline-block';
-  } catch(e){ jel.textContent='Erro: '+e.message; }
-}
-async function migExecutar(){
-  const jel=document.getElementById('mig-json'); jel.textContent='Migrando...';
-  try {
-    const d=await fetch('/api/migrar/executar',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'}).then(r=>r.json());
-    jel.textContent=JSON.stringify(d,null,2);
-  } catch(e){ jel.textContent='Erro: '+e.message; }
-}
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
 banner();
