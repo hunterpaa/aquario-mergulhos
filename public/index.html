@@ -906,10 +906,12 @@ async function pararTimer(k) {
 
   try {
     if(['A','E'].includes(grp.sistema)){
-      const lote=distribuir(grp.aquarios,min,grp.sistema).map(it=>({
-        mergulhador:merg,aquario:it.aquario,sistema:grp.sistema,servico:serv,
-        horaEntrada:he,horaSaida:calcSaida(he,it.minutos),minutos:it.minutos,data
-      }));
+      let cur=he;
+      const lote=distribuir(grp.aquarios,min,grp.sistema).map(it=>{
+        const saida=calcSaida(cur,it.minutos);
+        const reg={mergulhador:merg,aquario:it.aquario,sistema:grp.sistema,servico:serv,horaEntrada:cur,horaSaida:saida,minutos:it.minutos,data};
+        cur=saida; return reg;
+      });
       await fetch('/api/registros/lote',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({registros:lote})});
     } else {
       await fetch('/api/registros',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
@@ -988,10 +990,12 @@ async function salvar(){
   const data=dataRaw ? dataRaw.split('-').reverse().join('/') : new Date().toLocaleDateString('pt-BR');
   try {
     if(aquariosSelecionados.length>1){
-      const lote=distribuir(aquariosSelecionados,min,E.sistema).map(it=>({
-        mergulhador:E.mergulhador,aquario:it.aquario,sistema:E.sistema,servico:E.servico,
-        horaEntrada:e,horaSaida:calcSaida(e,it.minutos),minutos:it.minutos,observacoes:obs,data
-      }));
+      let cur=e;
+      const lote=distribuir(aquariosSelecionados,min,E.sistema).map(it=>{
+        const saida=calcSaida(cur,it.minutos);
+        const reg={mergulhador:E.mergulhador,aquario:it.aquario,sistema:E.sistema,servico:E.servico,horaEntrada:cur,horaSaida:saida,minutos:it.minutos,observacoes:obs,data};
+        cur=saida; return reg;
+      });
       const r=await fetch('/api/registros/lote',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({registros:lote})}).then(x=>x.json());
       if(r.erro) throw new Error(r.erro);
       ok.textContent=`✅ ${lote.length} registros — ${min}min distribuídos`;
