@@ -1,13 +1,17 @@
 {
   "permissions": {
     "allow": [
-      "WebFetch(domain:github.com)",
-      "WebFetch(domain:raw.githubusercontent.com)",
-      "WebFetch(domain:api.github.com)",
-      "Bash(node -e \"require\\('./server/server.js'\\)\")",
-      "Bash(kill %1)",
-      "Bash(node --check server/server.js)",
-      "Bash(del \"C:\\\\Users\\\\thecr\\\\Desktop\\\\Matteus-Sub - Copia\\\\.claude\\\\worktrees\\\\epic-cerf-9aad7f\\\\iniciar.bat\")"
+      "Bash(git init *)",
+      "Bash(git remote *)",
+      "Bash(git fetch *)",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(git push *)",
+      "Bash(git reset *)",
+      "Bash(git pull *)",
+      "Bash(git stash *)",
+      "Bash(git restore *)",
+      "Bash(node fix-aquarios.js)"
     ]
   }
 }

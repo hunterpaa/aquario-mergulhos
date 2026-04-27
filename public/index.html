@@ -208,6 +208,8 @@
     .bf { background:var(--f-bg); color:var(--f-tx); }
     .bp { background:rgba(255,179,0,.15); color:var(--yellow); }
     .bm { background:rgba(0,230,118,.1); color:var(--neon); font-size:.7rem; }
+    .btn-apagar { background:none; border:none; cursor:pointer; font-size:.9rem; opacity:.4; padding:2px 4px; border-radius:4px; transition:opacity .15s; }
+    .btn-apagar:hover { opacity:1; background:rgba(255,82,82,.15); }
 
     /* ══ CRONÔMETRO ═════════════════════════════════════════════════════════════ */
     .timers-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; }
@@ -302,7 +304,7 @@
 
     .mapa-planta {
       position: relative;
-      width: 390px;
+      width: 400px;
       height: 535px;
       margin: 0 auto;
     }
@@ -440,8 +442,8 @@
     @media (max-width: 420px) {
       .mapa-planta {
         transform: scale(0.78);
-        width: 390px; /* mantém largura lógica; container recalcula com height */
-        margin-bottom: calc(-535px * 0.22); /* compensa altura encurtada */
+        width: 400px;
+        margin-bottom: calc(-535px * 0.22);
       }
     }
   </style>
@@ -559,39 +561,35 @@
     <div class="mapa-container">
       <div class="mapa-planta">
 
-        <!-- SSV C (amarelo) -->
-        <button class="tk tk-c" id="t9"  onclick="selAq(9,'C')"  style="left:100px;top:5px;width:150px;height:40px">9</button>
+        <!-- C (9) — topo centro, separado da coluna D -->
+        <button class="tk tk-c" id="t9"  onclick="selAq(9,'C')"  style="left:95px;top:5px;width:170px;height:40px">9</button>
 
-        <!-- SSV D (verde) -->
-        <button class="tk tk-d" id="t10" onclick="selAq(10,'D')" style="left:100px;top:50px;width:48px;height:135px">10</button>
-        <button class="tk tk-d" id="t11" onclick="selAq(11,'D')" style="left:100px;top:190px;width:48px;height:70px">11</button>
-        <button class="tk tk-d" id="t12" onclick="selAq(12,'D')" style="left:100px;top:265px;width:82px;height:42px">12</button>
+        <!-- D+E — coluna esquerda contínua -->
+        <button class="tk tk-d" id="t10" onclick="selAq(10,'D')" style="left:10px;top:55px;width:55px;height:130px">10</button>
+        <button class="tk tk-d" id="t11" onclick="selAq(11,'D')" style="left:10px;top:190px;width:55px;height:70px">11</button>
+        <button class="tk tk-d" id="t12" onclick="selAq(12,'D')" style="left:10px;top:265px;width:85px;height:42px">12</button>
+        <button class="tk tk-e" id="t13" onclick="selAq(13,'E')" style="left:10px;top:312px;width:55px;height:38px">13</button>
+        <button class="tk tk-e" id="t14" onclick="selAq(14,'E')" style="left:10px;top:354px;width:55px;height:38px">14</button>
+        <button class="tk tk-e" id="t15" onclick="selAq(15,'E')" style="left:10px;top:396px;width:55px;height:38px">15</button>
+        <button class="tk tk-e" id="t16" onclick="selAq(16,'E')" style="left:10px;top:438px;width:55px;height:38px">16</button>
+        <button class="tk tk-e" id="t17" onclick="selAq(17,'E')" style="left:10px;top:480px;width:55px;height:38px">17</button>
 
-        <!-- SSV B (roxo) -->
-        <button class="tk tk-b" id="t8"  onclick="selAq(8,'B')"  style="left:235px;top:50px;width:48px;height:135px">8</button>
-        <button class="tk tk-b" id="t7"  onclick="selAq(7,'B')"  style="left:235px;top:190px;width:48px;height:70px">7</button>
-        <button class="tk tk-b" id="t6"  onclick="selAq(6,'B')"  style="left:201px;top:265px;width:82px;height:42px">6</button>
+        <!-- B+A — coluna direita contínua -->
+        <button class="tk tk-b" id="t8"  onclick="selAq(8,'B')"  style="left:335px;top:55px;width:55px;height:130px">8</button>
+        <button class="tk tk-b" id="t7"  onclick="selAq(7,'B')"  style="left:335px;top:190px;width:55px;height:70px">7</button>
+        <button class="tk tk-b" id="t6"  onclick="selAq(6,'B')"  style="left:305px;top:265px;width:85px;height:42px">6</button>
+        <button class="tk tk-a" id="t5"  onclick="selAq(5,'A')"  style="left:335px;top:312px;width:55px;height:38px">5</button>
+        <button class="tk tk-a" id="t4"  onclick="selAq(4,'A')"  style="left:335px;top:354px;width:55px;height:38px">4</button>
+        <button class="tk tk-a" id="t3"  onclick="selAq(3,'A')"  style="left:335px;top:396px;width:55px;height:38px">3</button>
+        <button class="tk tk-a" id="t2"  onclick="selAq(2,'A')"  style="left:335px;top:438px;width:55px;height:38px">2</button>
+        <button class="tk tk-a" id="t1"  onclick="selAq(1,'A')"  style="left:335px;top:480px;width:55px;height:38px">1</button>
 
-        <!-- SSV E (vermelho) -->
-        <button class="tk tk-e" id="t13" onclick="selAq(13,'E')" style="left:100px;top:312px;width:48px;height:38px">13</button>
-        <button class="tk tk-e" id="t14" onclick="selAq(14,'E')" style="left:100px;top:354px;width:48px;height:38px">14</button>
-        <button class="tk tk-e" id="t15" onclick="selAq(15,'E')" style="left:100px;top:396px;width:48px;height:38px">15</button>
-        <button class="tk tk-e" id="t16" onclick="selAq(16,'E')" style="left:100px;top:438px;width:48px;height:38px">16</button>
-        <button class="tk tk-e" id="t17" onclick="selAq(17,'E')" style="left:100px;top:480px;width:48px;height:38px">17</button>
-
-        <!-- SSV A (cinza) -->
-        <button class="tk tk-a" id="t5"  onclick="selAq(5,'A')"  style="left:235px;top:312px;width:48px;height:38px">5</button>
-        <button class="tk tk-a" id="t4"  onclick="selAq(4,'A')"  style="left:235px;top:354px;width:48px;height:38px">4</button>
-        <button class="tk tk-a" id="t3"  onclick="selAq(3,'A')"  style="left:235px;top:396px;width:48px;height:38px">3</button>
-        <button class="tk tk-a" id="t2"  onclick="selAq(2,'A')"  style="left:235px;top:438px;width:48px;height:38px">2</button>
-        <button class="tk tk-a" id="t1"  onclick="selAq(1,'A')"  style="left:235px;top:480px;width:48px;height:38px">1</button>
-
-        <!-- SSV F (ciano) — forma U -->
-        <button class="tk tk-f" id="t20" onclick="selAq(20,'F')" style="left:155px;top:375px;width:73px;height:38px">20</button>
-        <button class="tk tk-f" id="t21" onclick="selAq(21,'F')" style="left:155px;top:417px;width:33px;height:38px">21</button>
-        <button class="tk tk-f" id="t19" onclick="selAq(19,'F')" style="left:195px;top:417px;width:33px;height:38px">19</button>
-        <button class="tk tk-f" id="t22" onclick="selAq(22,'F')" style="left:155px;top:459px;width:33px;height:38px">22</button>
-        <button class="tk tk-f" id="t18" onclick="selAq(18,'F')" style="left:195px;top:459px;width:33px;height:38px">18</button>
+        <!-- F — centro, corredores simétricos de 65px -->
+        <button class="tk tk-f" id="t20" onclick="selAq(20,'F')" style="left:160px;top:354px;width:80px;height:38px">20</button>
+        <button class="tk tk-f" id="t21" onclick="selAq(21,'F')" style="left:160px;top:396px;width:37px;height:38px">21</button>
+        <button class="tk tk-f" id="t19" onclick="selAq(19,'F')" style="left:203px;top:396px;width:37px;height:38px">19</button>
+        <button class="tk tk-f" id="t22" onclick="selAq(22,'F')" style="left:160px;top:438px;width:37px;height:38px">22</button>
+        <button class="tk tk-f" id="t18" onclick="selAq(18,'F')" style="left:203px;top:438px;width:37px;height:38px">18</button>
 
       </div>
     </div>
@@ -699,7 +697,7 @@
     <div class="tab-scroll">
       <table><thead><tr>
         <th>ID</th><th>Data</th><th>Mergulhador</th><th>Tanque</th>
-        <th>Sistema</th><th>Serviço</th><th>Entrada</th><th>Saída</th><th>Min</th><th>Status</th>
+        <th>Sistema</th><th>Serviço</th><th>Entrada</th><th>Saída</th><th>Min</th><th>Status</th><th></th>
       </tr></thead>
       <tbody id="tab-hist"></tbody></table>
     </div>
@@ -833,8 +831,53 @@ async function carregarDash() {
   } catch(err) { console.error('dash err:', err); }
 }
 
-// ── CRONÔMETRO ─────────────────────────────────────────────────────────────────
+// ── CRONÔMETRO COMPARTILHADO ──────────────────────────────────────────────────
 const timers = {};
+
+function conectarTimerStream() {
+  setInterval(async () => {
+    try {
+      const remoto = await fetch('/timers/estado').then(r => r.json());
+      sincronizarTimers(remoto);
+    } catch {}
+  }, 2000);
+}
+
+function fmtSeg(s){ return `${String(Math.floor(s/3600)).padStart(2,'0')}:${String(Math.floor(s%3600/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`; }
+
+function sincronizarTimers(remoto) {
+  ['leonardo','kelvin','danilo'].forEach(k => {
+    const estado = remoto[k];
+    const local  = timers[k];
+    if (estado) {
+      if (local?.rodando && local.inicioMs === estado.inicioMs) return;
+      if (local?.iv) clearInterval(local.iv);
+      const { inicioMs, horaEntrada, grupo, servico } = estado;
+      timers[k] = { inicio: new Date(inicioMs), inicioMs, horaEntrada, grupo, servico, rodando: true,
+        iv: setInterval(() => {
+          const el = document.getElementById('td-'+k);
+          if (el) { el.textContent = fmtSeg(Math.floor((Date.now()-inicioMs)/1000)); el.className='timer-disp'; }
+        }, 1000)
+      };
+      const btn = document.getElementById('tb-'+k);
+      if (btn) { btn.textContent='Finalizar'; btn.className='btn btn-sair'; }
+      document.getElementById('tc-'+k)?.classList.add('ativo');
+      const tm = document.getElementById('tm-'+k); if (tm) tm.textContent='Entrou: '+horaEntrada;
+      const tg = document.getElementById('tg-'+k); if (tg && grupo)   { tg.value=grupo;   tg.disabled=true; }
+      const ts = document.getElementById('ts-'+k); if (ts && servico) { ts.value=servico; ts.disabled=true; }
+      const el = document.getElementById('td-'+k);
+      if (el) { el.textContent=fmtSeg(Math.floor((Date.now()-inicioMs)/1000)); el.className='timer-disp'; }
+    } else if (local?.iv) {
+      clearInterval(local.iv); timers[k] = null;
+      const td = document.getElementById('td-'+k); if (td) { td.textContent='00:00:00'; td.className='timer-disp parado'; }
+      const btn = document.getElementById('tb-'+k); if (btn) { btn.textContent='Entrar na água'; btn.className='btn btn-entrar'; }
+      document.getElementById('tc-'+k)?.classList.remove('ativo');
+      const tm = document.getElementById('tm-'+k); if (tm) tm.textContent='';
+      const tg = document.getElementById('tg-'+k); if (tg) tg.disabled=false;
+      const ts = document.getElementById('ts-'+k); if (ts) ts.disabled=false;
+    }
+  });
+}
 
 function montarTimers() {
   banner();
@@ -866,6 +909,24 @@ function montarTimers() {
       <div id="tm-${k}" style="font-size:.76rem;color:var(--txt2);text-align:center;width:100%"></div>
     </div>`;
   }).join('');
+  reaplicarTimersUI();
+}
+
+function reaplicarTimersUI() {
+  ['leonardo','kelvin','danilo'].forEach(k => {
+    const t = timers[k];
+    if (!t?.rodando) return;
+    const btn = document.getElementById('tb-'+k);
+    if (btn) { btn.textContent='Finalizar'; btn.className='btn btn-sair'; }
+    document.getElementById('tc-'+k)?.classList.add('ativo');
+    const tm = document.getElementById('tm-'+k); if (tm) tm.textContent='Entrou: '+t.horaEntrada;
+    const tg = document.getElementById('tg-'+k);
+    if (tg && t.grupo) { tg.value=t.grupo; tg.disabled=true; }
+    const ts = document.getElementById('ts-'+k);
+    if (ts && t.servico) { ts.value=t.servico; ts.disabled=true; }
+    const el = document.getElementById('td-'+k);
+    if (el) { el.textContent=fmtSeg(Math.floor((Date.now()-t.inicioMs)/1000)); el.className='timer-disp'; }
+  });
 }
 
 function toggleTimer(k) { timers[k]?.rodando ? pararTimer(k) : iniciarTimer(k); }
@@ -874,23 +935,28 @@ function iniciarTimer(k) {
   const g = document.getElementById('tg-'+k)?.value;
   if (!g) { alert('Selecione o grupo primeiro!'); return; }
   const agr = new Date();
-  timers[k] = { inicio:agr, horaEntrada:agr.toTimeString().substring(0,5), rodando:true,
+  const inicioMs = agr.getTime();
+  const horaEntrada = agr.toTimeString().substring(0,5);
+  const servico = document.getElementById('ts-'+k)?.value || '';
+  timers[k] = { inicio:agr, inicioMs, horaEntrada, grupo:g, servico, rodando:true,
     iv: setInterval(()=>{
-      const s=Math.floor((new Date()-timers[k].inicio)/1000);
       const el=document.getElementById('td-'+k);
-      if(el){el.textContent=`${String(Math.floor(s/3600)).padStart(2,'0')}:${String(Math.floor(s%3600/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`;el.className='timer-disp';}
+      if(el){el.textContent=fmtSeg(Math.floor((Date.now()-inicioMs)/1000));el.className='timer-disp';}
     },1000)
   };
   const btn=document.getElementById('tb-'+k); btn.textContent='Finalizar'; btn.className='btn btn-sair';
   document.getElementById('tc-'+k)?.classList.add('ativo');
-  document.getElementById('tm-'+k).textContent='Entrou: '+timers[k].horaEntrada;
+  document.getElementById('tm-'+k).textContent='Entrou: '+horaEntrada;
   document.getElementById('tg-'+k).disabled=true;
   document.getElementById('ts-'+k).disabled=true;
+  fetch('/timers/start',{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({mergulhador:k,inicioMs,horaEntrada,grupo:g,servico})}).catch(()=>{});
 }
 
 async function pararTimer(k) {
   if(!timers[k]) return;
   clearInterval(timers[k].iv); timers[k].rodando=false;
+  fetch('/timers/stop',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mergulhador:k})}).catch(()=>{});
   const agr=new Date(), hs=agr.toTimeString().substring(0,5), he=timers[k].horaEntrada;
   const [hE,mE]=he.split(':').map(Number), [hS,mS]=hs.split(':').map(Number);
   const min=Math.max(0,(hS*60+mS)-(hE*60+mE));
@@ -1057,10 +1123,23 @@ function filtrar(){
         <td>${r.horaEntrada}</td><td>${r.horaSaida}</td>
         <td>${r.minutos||'—'}</td>
         <td>${r.status==='Sem Mergulho'?'<span class="badge bp">Pausa</span>':'<span class="badge bm">✓</span>'}</td>
+        <td><button class="btn-apagar" onclick="apagarRegistro('${r.id}',this)" title="Apagar">🗑</button></td>
       </tr>`).join('')
-    : '<tr><td colspan="10" style="text-align:center;color:var(--txt3);padding:20px">Nenhum registro</td></tr>';
+    : '<tr><td colspan="11" style="text-align:center;color:var(--txt3);padding:20px">Nenhum registro</td></tr>';
 }
 
+
+// ── APAGAR REGISTRO ───────────────────────────────────────────────────────────
+async function apagarRegistro(id, btn) {
+  if (!confirm(`Apagar registro #${id} da planilha? Esta ação não pode ser desfeita.`)) return;
+  btn.disabled = true; btn.textContent = '...';
+  try {
+    const r = await fetch(`/api/registros/${id}`, { method:'DELETE' }).then(x=>x.json());
+    if (r.erro) throw new Error(r.erro);
+    btn.closest('tr').remove();
+    E.registros = E.registros.filter(x => x.id !== id);
+  } catch(err) { btn.disabled=false; btn.textContent='🗑'; alert('Erro: '+err.message); }
+}
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
 banner();
@@ -1068,6 +1147,7 @@ carregarDash();
 montarTimers();
 marcarHoje();
 document.getElementById('f-data').value = new Date().toISOString().slice(0,10);
+conectarTimerStream();
 </script>
 </body>
 </html>

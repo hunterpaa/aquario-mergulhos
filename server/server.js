@@ -366,6 +366,48 @@ app.get('/api/sistemas', (req,res) => {
   res.json({ sistemas:SISTEMAS, cronograma:CRONOGRAMA, sistemasHoje:CRONOGRAMA[new Date().getDay()]||[] });
 });
 
+// ─── APAGAR REGISTRO ───────────────────────────────────────────────────────────
+app.delete('/api/registros/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const linhas = await lerRange(`'${ABA_REG}'!A2:A`);
+    const rowIdx = linhas.findIndex(l => l[0] === id);
+    if (rowIdx < 0) return res.status(404).json({ erro: 'Registro não encontrado' });
+    const rowNumber = rowIdx + 2; // linha real na planilha (1-indexed, +1 cabeçalho)
+
+    const meta = await sh().spreadsheets.get({ spreadsheetId: SHEET_ID });
+    const sheet = meta.data.sheets.find(s => s.properties.title === ABA_REG);
+    if (!sheet) return res.status(404).json({ erro: 'Aba não encontrada' });
+
+    await sh().spreadsheets.batchUpdate({
+      spreadsheetId: SHEET_ID,
+      requestBody: { requests: [{ deleteDimension: {
+        range: { sheetId: sheet.properties.sheetId, dimension: 'ROWS',
+                 startIndex: rowNumber - 1, endIndex: rowNumber }
+      }}]}
+    });
+    res.json({ sucesso: true });
+  } catch (err) { res.status(500).json({ erro: err.message }); }
+});
+
+// ─── CRONÔMETRO COMPARTILHADO ─────────────────────────────────────────────────
+const timerState = {};   // { [key]: { inicioMs, horaEntrada, grupo, servico } }
+
+app.get('/timers/estado', (req, res) => {
+  res.json(timerState);
+});
+
+app.post('/timers/start', (req, res) => {
+  const { mergulhador, inicioMs, horaEntrada, grupo, servico } = req.body;
+  timerState[mergulhador] = { inicioMs, horaEntrada, grupo, servico };
+  res.json({ ok: true });
+});
+
+app.post('/timers/stop', (req, res) => {
+  delete timerState[req.body.mergulhador];
+  res.json({ ok: true });
+});
+
 app.get('*', (req,res) => {
   res.sendFile(path.join(__dirname,'../public/index.html'));
 });
