@@ -390,22 +390,105 @@ app.delete('/api/registros/:id', async (req, res) => {
   } catch (err) { res.status(500).json({ erro: err.message }); }
 });
 
-// ─── CRONÔMETRO COMPARTILHADO ─────────────────────────────────────────────────
-const timerState = {};   // { [key]: { inicioMs, horaEntrada, grupo, servico } }
+// ─── CRONÔMETRO COMPARTILHADO (estado persistido no Google Sheets) ────────────
+// Cada instância (localhost, Render) lê/escreve na mesma aba → estado unificado
+const ABA_TIMERS = 'Timers';
+let _timerCache   = {};
+let _timerCacheTs = 0;
+let _timerAbaOk   = false;
 
-app.get('/timers/estado', (req, res) => {
-  res.json(timerState);
+async function garantirAbaTimers() {
+  if (_timerAbaOk) return;
+  const meta = await sh().spreadsheets.get({ spreadsheetId: SHEET_ID });
+  const abas = meta.data.sheets.map(s => s.properties.title);
+  if (!abas.includes(ABA_TIMERS)) {
+    await sh().spreadsheets.batchUpdate({
+      spreadsheetId: SHEET_ID,
+      requestBody: { requests: [{ addSheet: { properties: { title: ABA_TIMERS } } }] },
+    });
+    await sh().spreadsheets.values.update({
+      spreadsheetId: SHEET_ID, range: `'${ABA_TIMERS}'!A1`,
+      valueInputOption: 'RAW',
+      requestBody: { values: [['Mergulhador','InicioMs','HoraEntrada','Grupo','Servico']] },
+    });
+  }
+  _timerAbaOk = true;
+}
+
+async function lerTimersSheets() {
+  // Cache de 3 s para não estourar cota da API no polling de 2 s do frontend
+  if (Date.now() - _timerCacheTs < 3000) return _timerCache;
+  const linhas = await lerRange(`'${ABA_TIMERS}'!A2:E`);
+  const estado = {};
+  for (const l of linhas) {
+    if (!l[0]) continue;
+    estado[l[0]] = { inicioMs: Number(l[1]), horaEntrada: l[2]||'', grupo: l[3]||'', servico: l[4]||'' };
+  }
+  _timerCache   = estado;
+  _timerCacheTs = Date.now();
+  return _timerCache;
+}
+
+async function salvarTimerSheets(merg, dados) {
+  const linhas = await lerRange(`'${ABA_TIMERS}'!A2:A`);
+  const rowIdx = linhas.findIndex(l => l[0] === merg);
+  const vals   = [[merg, dados.inicioMs, dados.horaEntrada, dados.grupo, dados.servico]];
+  if (rowIdx >= 0) {
+    const row = rowIdx + 2;
+    await sh().spreadsheets.values.update({
+      spreadsheetId: SHEET_ID, range: `'${ABA_TIMERS}'!A${row}:E${row}`,
+      valueInputOption: 'RAW', requestBody: { values: vals },
+    });
+  } else {
+    await sh().spreadsheets.values.append({
+      spreadsheetId: SHEET_ID, range: `'${ABA_TIMERS}'!A1`,
+      valueInputOption: 'RAW', requestBody: { values: vals },
+    });
+  }
+  _timerCache[merg] = dados;
+  _timerCacheTs = Date.now();
+}
+
+async function removerTimerSheets(merg) {
+  const linhas = await lerRange(`'${ABA_TIMERS}'!A2:A`);
+  const rowIdx = linhas.findIndex(l => l[0] === merg);
+  if (rowIdx < 0) { delete _timerCache[merg]; return; }
+  const rowNumber = rowIdx + 2;
+  const meta  = await sh().spreadsheets.get({ spreadsheetId: SHEET_ID });
+  const sheet = meta.data.sheets.find(s => s.properties.title === ABA_TIMERS);
+  await sh().spreadsheets.batchUpdate({
+    spreadsheetId: SHEET_ID,
+    requestBody: { requests: [{ deleteDimension: {
+      range: { sheetId: sheet.properties.sheetId, dimension: 'ROWS',
+               startIndex: rowNumber - 1, endIndex: rowNumber }
+    }}] },
+  });
+  delete _timerCache[merg];
+  _timerCacheTs = Date.now();
+}
+
+app.get('/timers/estado', async (req, res) => {
+  try {
+    await garantirAbaTimers();
+    res.json(await lerTimersSheets());
+  } catch (err) { res.status(500).json({}); }
 });
 
-app.post('/timers/start', (req, res) => {
+app.post('/timers/start', async (req, res) => {
   const { mergulhador, inicioMs, horaEntrada, grupo, servico } = req.body;
-  timerState[mergulhador] = { inicioMs, horaEntrada, grupo, servico };
-  res.json({ ok: true });
+  try {
+    await garantirAbaTimers();
+    await salvarTimerSheets(mergulhador, { inicioMs, horaEntrada, grupo, servico });
+    res.json({ ok: true });
+  } catch (err) { res.status(500).json({ ok: false, erro: err.message }); }
 });
 
-app.post('/timers/stop', (req, res) => {
-  delete timerState[req.body.mergulhador];
-  res.json({ ok: true });
+app.post('/timers/stop', async (req, res) => {
+  try {
+    await garantirAbaTimers();
+    await removerTimerSheets(req.body.mergulhador);
+    res.json({ ok: true });
+  } catch (err) { res.status(500).json({ ok: false, erro: err.message }); }
 });
 
 app.get('*', (req,res) => {
