@@ -3,7 +3,19 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Matteus-Sub</title>
+  <title>Gestão Aquário Municipal</title>
+
+  <!-- PWA -->
+  <link rel="manifest" href="/manifest.json"/>
+  <meta name="theme-color" content="#07111f"/>
+  <meta name="mobile-web-app-capable" content="yes"/>
+
+  <!-- iOS -->
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+  <meta name="apple-mobile-web-app-title" content="Aquário"/>
+  <link rel="apple-touch-icon" href="/icons/icon-192.png"/>
+
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
   <style>
@@ -1157,6 +1169,15 @@ montarTimers();
 marcarHoje();
 document.getElementById('f-data').value = new Date().toISOString().slice(0,10);
 conectarTimerStream();
+
+// ── Service Worker (PWA) ──────────────────────────────────────────────────────
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/service-worker.js')
+      .then(reg => console.log('SW registrado:', reg.scope))
+      .catch(err => console.warn('SW falhou:', err));
+  });
+}
 </script>
 </body>
 </html>
