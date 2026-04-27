@@ -416,8 +416,17 @@
       .nav-tab { padding: 12px 10px; font-size: .76rem; white-space: nowrap; }
 
       .tela { padding: 10px; }
-      .dash-top { grid-template-columns: 1fr 1fr; }
-      .kpi-ciclo { grid-column: 1 / -1; }
+
+      /* Dashboard mobile: Total + Ritmo lado a lado, Ciclo e Estimativa largura total */
+      .dash-top {
+        grid-template-columns: 1fr 1fr;
+        grid-template-areas:
+          "total ritmo"
+          "ciclo ciclo";
+      }
+      .dash-top .kpi:nth-child(1) { grid-area: total; }
+      .dash-top .kpi:nth-child(3) { grid-area: ritmo; }
+      .kpi-ciclo { grid-area: ciclo; }
       .merg-grid { grid-template-columns: repeat(3, 1fr); }
       .serv-grid { grid-template-columns: repeat(2, 1fr); }
       .hora-row  { grid-template-columns: 1fr 1fr; }
