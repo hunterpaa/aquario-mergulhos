@@ -1183,6 +1183,57 @@ if ('serviceWorker' in navigator) {
       .catch(err => console.warn('SW falhou:', err));
   });
 }
+
+// ── Banner "Instalar app" iOS ─────────────────────────────────────────────────
+(function() {
+  const isIos     = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  const isSafari  = /safari/i.test(navigator.userAgent) && !/crios|fxios|opios|chrome/i.test(navigator.userAgent);
+  const installed = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone;
+  const dismissed = localStorage.getItem('pwa-ios-dismissed');
+  if (!isIos || !isSafari || installed || dismissed) return;
+
+  const banner = document.createElement('div');
+  banner.id = 'ios-install-banner';
+  banner.innerHTML = `
+    <div style="display:flex;align-items:center;gap:12px;flex:1">
+      <img src="/icons/icon-192.png" style="width:44px;height:44px;border-radius:10px;flex-shrink:0"/>
+      <div>
+        <div style="font-weight:700;font-size:.9rem;color:#fff">Instalar Matteus-Sub</div>
+        <div style="font-size:.78rem;color:#7a9bbf;margin-top:2px">
+          Toque em <span style="color:#00e5c0">􀈂</span> e depois <strong style="color:#c9d8ef">"Adicionar à Tela de Início"</strong>
+        </div>
+      </div>
+    </div>
+    <button id="ios-banner-close" style="background:none;border:none;color:#7a9bbf;font-size:1.3rem;cursor:pointer;padding:4px;line-height:1">✕</button>
+  `;
+  Object.assign(banner.style, {
+    position:'fixed', bottom:'0', left:'0', right:'0',
+    background:'#0f1e35', borderTop:'1px solid rgba(80,140,220,.2)',
+    padding:'14px 16px', display:'flex', alignItems:'center',
+    gap:'8px', zIndex:'9999', boxShadow:'0 -4px 20px rgba(0,0,0,.4)'
+  });
+
+  // Setinha apontando pro botão de compartilhar
+  const arrow = document.createElement('div');
+  arrow.innerHTML = '▼';
+  Object.assign(arrow.style, {
+    position:'fixed', bottom:'72px', left:'50%', transform:'translateX(-50%)',
+    color:'#00e5c0', fontSize:'1.4rem', zIndex:'9999',
+    animation:'bounce .8s infinite alternate'
+  });
+
+  document.body.appendChild(banner);
+  document.body.appendChild(arrow);
+
+  document.getElementById('ios-banner-close').addEventListener('click', () => {
+    banner.remove(); arrow.remove();
+    localStorage.setItem('pwa-ios-dismissed', '1');
+  });
+})();
 </script>
+
+<style>
+@keyframes bounce { from { transform: translateX(-50%) translateY(0); } to { transform: translateX(-50%) translateY(6px); } }
+</style>
 </body>
 </html>
