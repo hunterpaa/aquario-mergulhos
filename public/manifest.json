@@ -1,7 +1,7 @@
 {
-  "name": "Gestão Aquário Municipal",
-  "short_name": "Aquário",
-  "description": "Sistema de gestão de mergulhos e manutenção do aquário municipal",
+  "name": "Matteus-Sub",
+  "short_name": "SUB",
+  "description": "Gestão de mergulhos e manutenção subaquática",
   "start_url": "/",
   "display": "standalone",
   "orientation": "portrait",
@@ -13,13 +13,13 @@
       "src": "/icons/icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "maskable"
     },
     {
       "src": "/icons/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "maskable"
     }
   ]
 }
