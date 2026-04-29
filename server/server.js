@@ -205,6 +205,19 @@ app.get('/api/debug/abas', async (req, res) => {
   }
 });
 
+app.get('/api/debug/values', async (req, res) => {
+  const t0 = Date.now();
+  try {
+    const r = await withTimeout(
+      sh().spreadsheets.values.get({ spreadsheetId: SHEET_ID, range: "'Registros'!A1:A3" }),
+      25000
+    );
+    res.json({ ok: true, ms: Date.now()-t0, values: r.data.values });
+  } catch (err) {
+    res.status(500).json({ ok: false, ms: Date.now()-t0, erro: err.message, code: err.code, status: err.status });
+  }
+});
+
 // ─── MIGRAÇÃO (somente rota que ainda usa Operação) ───────────────────────────
 app.get('/api/migrar/preview', async (req, res) => {
   try {
