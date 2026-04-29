@@ -220,19 +220,17 @@ app.get('/api/debug/values', async (req, res) => {
 app.get('/api/debug/rawfetch', async (req, res) => {
   const t0 = Date.now();
   try {
-    const client = await getAuth().getClient();
-    const { token } = await client.getAccessToken();
-    const ctrl = new AbortController();
-    const timer = setTimeout(() => ctrl.abort(), 12000);
-    try {
-      const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${encodeURIComponent("'Timers'!A1:A3")}`;
-      const r = await fetch(url, { headers: { Authorization: `Bearer ${token}` }, signal: ctrl.signal });
-      clearTimeout(timer);
-      const data = await r.json();
-      res.json({ ok: r.ok, via: 'fetch', ms: Date.now()-t0, status: r.status, data });
-    } finally { clearTimeout(timer); }
+    // Testa spreadsheets.get com includeGridData=true (mesmo endpoint que funciona)
+    const r = await sh().spreadsheets.get({
+      spreadsheetId: SHEET_ID,
+      includeGridData: true,
+      ranges: ["'Registros'!A1:A3"],
+    }, GAXIOS_OPTS);
+    const rows = r.data.sheets?.[0]?.data?.[0]?.rowData || [];
+    const values = rows.map(row => row.values?.map(c => c.formattedValue || '') || []);
+    res.json({ ok: true, via: 'includeGridData', ms: Date.now()-t0, values });
   } catch (err) {
-    res.status(500).json({ ok: false, via: 'fetch', ms: Date.now()-t0, erro: err.message });
+    res.status(500).json({ ok: false, via: 'includeGridData', ms: Date.now()-t0, erro: err.message });
   }
 });
 
