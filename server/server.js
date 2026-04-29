@@ -211,9 +211,28 @@ app.get('/api/debug/values', async (req, res) => {
       { spreadsheetId: SHEET_ID, range: "'Registros'!A1:A3" },
       GAXIOS_OPTS
     );
-    res.json({ ok: true, ms: Date.now()-t0, values: r.data.values });
+    res.json({ ok: true, via: 'gaxios', ms: Date.now()-t0, values: r.data.values });
   } catch (err) {
-    res.status(500).json({ ok: false, ms: Date.now()-t0, erro: err.message, code: err.code, status: err.status });
+    res.status(500).json({ ok: false, via: 'gaxios', ms: Date.now()-t0, erro: err.message });
+  }
+});
+
+app.get('/api/debug/rawfetch', async (req, res) => {
+  const t0 = Date.now();
+  try {
+    const client = await getAuth().getClient();
+    const { token } = await client.getAccessToken();
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 12000);
+    try {
+      const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${encodeURIComponent("'Timers'!A1:A3")}`;
+      const r = await fetch(url, { headers: { Authorization: `Bearer ${token}` }, signal: ctrl.signal });
+      clearTimeout(timer);
+      const data = await r.json();
+      res.json({ ok: r.ok, via: 'fetch', ms: Date.now()-t0, status: r.status, data });
+    } finally { clearTimeout(timer); }
+  } catch (err) {
+    res.status(500).json({ ok: false, via: 'fetch', ms: Date.now()-t0, erro: err.message });
   }
 });
 
