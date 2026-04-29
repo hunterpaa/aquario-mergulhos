@@ -1213,20 +1213,10 @@ if ('serviceWorker' in navigator) {
     gap:'8px', zIndex:'9999', boxShadow:'0 -4px 20px rgba(0,0,0,.4)'
   });
 
-  // Setinha apontando pro botão de compartilhar
-  const arrow = document.createElement('div');
-  arrow.innerHTML = '▼';
-  Object.assign(arrow.style, {
-    position:'fixed', bottom:'72px', left:'50%', transform:'translateX(-50%)',
-    color:'#00e5c0', fontSize:'1.4rem', zIndex:'9999',
-    animation:'bounce .8s infinite alternate'
-  });
-
   document.body.appendChild(banner);
-  document.body.appendChild(arrow);
 
   document.getElementById('ios-banner-close').addEventListener('click', () => {
-    banner.remove(); arrow.remove();
+    banner.remove();
     localStorage.setItem('pwa-ios-dismissed', '1');
   });
 })();
