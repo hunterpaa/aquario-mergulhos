@@ -46,22 +46,28 @@ app.get('/logs/stream', (req, res) => {
 });
 // ========== FIM GERENCIADOR ==========
 // ─── AUTH ──────────────────────────────────────────────────────────────────────
+// Singleton — evita criar novo JWT client (e novo fetch de token) a cada chamada
+let _authInstance = null;
 function getAuth() {
+  if (_authInstance) return _authInstance;
   if (process.env.GOOGLE_CREDENTIALS) {
     const creds = JSON.parse(process.env.GOOGLE_CREDENTIALS);
-    return new google.auth.GoogleAuth({
+    _authInstance = new google.auth.GoogleAuth({
       credentials: creds,
       scopes: ['https://www.googleapis.com/auth/spreadsheets'],
     });
+  } else {
+    _authInstance = new google.auth.GoogleAuth({
+      keyFile: path.join(__dirname, 'google-key.json'),
+      scopes: ['https://www.googleapis.com/auth/spreadsheets'],
+    });
   }
-  return new google.auth.GoogleAuth({
-    keyFile: path.join(__dirname, 'google-key.json'),
-    scopes: ['https://www.googleapis.com/auth/spreadsheets'],
-  });
+  return _authInstance;
 }
 
 const SHEET_ID  = process.env.SPREADSHEET_ID || '16y-AmjOYbgUON0FzWzxxJFlyZOzTHa6S8ieeZ0EVVJI';
 const ABA_REG   = 'Registros';
+let _regAbaOk   = false;
 const ABA_OP    = 'Operação'; // usado SOMENTE na rota /api/migrar
 
 const CABECALHO = ['ID','Data','Mergulhador','Aquário/Tanque','Sistema',
@@ -106,21 +112,23 @@ async function lerRange(range) {
 }
 
 async function garantirAba() {
-  const meta = await sh().spreadsheets.get({ spreadsheetId: SHEET_ID });
+  if (_regAbaOk) return;
+  const meta = await withTimeout(sh().spreadsheets.get({ spreadsheetId: SHEET_ID }));
   const abas = meta.data.sheets.map(s => s.properties.title);
-  if (abas.includes(ABA_REG)) return;
-
-  await sh().spreadsheets.batchUpdate({
-    spreadsheetId: SHEET_ID,
-    requestBody: { requests: [{ addSheet: { properties: { title: ABA_REG } } }] },
-  });
-  await sh().spreadsheets.values.update({
-    spreadsheetId: SHEET_ID,
-    range: `'${ABA_REG}'!A1`,
-    valueInputOption: 'RAW',
-    requestBody: { values: [CABECALHO] },
-  });
-  console.log(`Aba "${ABA_REG}" criada.`);
+  if (!abas.includes(ABA_REG)) {
+    await sh().spreadsheets.batchUpdate({
+      spreadsheetId: SHEET_ID,
+      requestBody: { requests: [{ addSheet: { properties: { title: ABA_REG } } }] },
+    });
+    await sh().spreadsheets.values.update({
+      spreadsheetId: SHEET_ID,
+      range: `'${ABA_REG}'!A1`,
+      valueInputOption: 'RAW',
+      requestBody: { values: [CABECALHO] },
+    });
+    console.log(`Aba "${ABA_REG}" criada.`);
+  }
+  _regAbaOk = true;
 }
 
 function linhaObj(l) {
