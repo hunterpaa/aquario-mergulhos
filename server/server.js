@@ -93,8 +93,15 @@ function normNome(n) {
 // ─── HELPERS SHEETS ────────────────────────────────────────────────────────────
 function sh() { return google.sheets({ version:'v4', auth: getAuth() }); }
 
+function withTimeout(promise, ms = 15000) {
+  return Promise.race([
+    promise,
+    new Promise((_, reject) => setTimeout(() => reject(new Error('Google API timeout')), ms)),
+  ]);
+}
+
 async function lerRange(range) {
-  const r = await sh().spreadsheets.values.get({ spreadsheetId: SHEET_ID, range });
+  const r = await withTimeout(sh().spreadsheets.values.get({ spreadsheetId: SHEET_ID, range }));
   return r.data.values || [];
 }
 
@@ -393,9 +400,10 @@ app.delete('/api/registros/:id', async (req, res) => {
 // ─── CRONÔMETRO COMPARTILHADO (estado persistido no Google Sheets) ────────────
 // Cada instância (localhost, Render) lê/escreve na mesma aba → estado unificado
 const ABA_TIMERS = 'Timers';
-let _timerCache   = {};
-let _timerCacheTs = 0;
-let _timerAbaOk   = false;
+let _timerCache      = {};
+let _timerCacheTs    = 0;
+let _timerAbaOk      = false;
+let _timerReadPending = false;
 
 async function garantirAbaTimers() {
   if (_timerAbaOk) return;
@@ -416,16 +424,23 @@ async function garantirAbaTimers() {
 }
 
 async function lerTimersSheets() {
-  // Cache de 3 s para não estourar cota da API no polling de 2 s do frontend
-  if (Date.now() - _timerCacheTs < 3000) return _timerCache;
-  const linhas = await lerRange(`'${ABA_TIMERS}'!A2:E`);
-  const estado = {};
-  for (const l of linhas) {
-    if (!l[0]) continue;
-    estado[l[0]] = { inicioMs: Number(l[1]), horaEntrada: l[2]||'', grupo: l[3]||'', servico: l[4]||'' };
+  // Cache de 10 s — evita rajadas ao Google Sheets API com múltiplos clientes
+  if (Date.now() - _timerCacheTs < 10000) return _timerCache;
+  // Se já há uma leitura em andamento, devolve o cache atual sem disparar outra
+  if (_timerReadPending) return _timerCache;
+  _timerReadPending = true;
+  try {
+    const linhas = await lerRange(`'${ABA_TIMERS}'!A2:E`);
+    const estado = {};
+    for (const l of linhas) {
+      if (!l[0]) continue;
+      estado[l[0]] = { inicioMs: Number(l[1]), horaEntrada: l[2]||'', grupo: l[3]||'', servico: l[4]||'' };
+    }
+    _timerCache   = estado;
+    _timerCacheTs = Date.now();
+  } finally {
+    _timerReadPending = false;
   }
-  _timerCache   = estado;
-  _timerCacheTs = Date.now();
   return _timerCache;
 }
 
