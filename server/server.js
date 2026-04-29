@@ -99,33 +99,32 @@ function normNome(n) {
 // ─── HELPERS SHEETS ────────────────────────────────────────────────────────────
 function sh() { return google.sheets({ version:'v4', auth: getAuth() }); }
 
-function withTimeout(promise, ms = 15000) {
-  return Promise.race([
-    promise,
-    new Promise((_, reject) => setTimeout(() => reject(new Error('Google API timeout')), ms)),
-  ]);
-}
+// Opções padrão para todas as chamadas: sem retry, timeout HTTP real de 12s
+const GAXIOS_OPTS = { retry: false, timeout: 12000 };
 
 async function lerRange(range) {
-  const r = await withTimeout(sh().spreadsheets.values.get({ spreadsheetId: SHEET_ID, range }));
+  const r = await sh().spreadsheets.values.get(
+    { spreadsheetId: SHEET_ID, range },
+    GAXIOS_OPTS
+  );
   return r.data.values || [];
 }
 
 async function garantirAba() {
   if (_regAbaOk) return;
-  const meta = await withTimeout(sh().spreadsheets.get({ spreadsheetId: SHEET_ID }));
+  const meta = await sh().spreadsheets.get({ spreadsheetId: SHEET_ID }, GAXIOS_OPTS);
   const abas = meta.data.sheets.map(s => s.properties.title);
   if (!abas.includes(ABA_REG)) {
     await sh().spreadsheets.batchUpdate({
       spreadsheetId: SHEET_ID,
       requestBody: { requests: [{ addSheet: { properties: { title: ABA_REG } } }] },
-    });
+    }, GAXIOS_OPTS);
     await sh().spreadsheets.values.update({
       spreadsheetId: SHEET_ID,
       range: `'${ABA_REG}'!A1`,
       valueInputOption: 'RAW',
       requestBody: { values: [CABECALHO] },
-    });
+    }, GAXIOS_OPTS);
     console.log(`Aba "${ABA_REG}" criada.`);
   }
   _regAbaOk = true;
@@ -208,9 +207,9 @@ app.get('/api/debug/abas', async (req, res) => {
 app.get('/api/debug/values', async (req, res) => {
   const t0 = Date.now();
   try {
-    const r = await withTimeout(
-      sh().spreadsheets.values.get({ spreadsheetId: SHEET_ID, range: "'Registros'!A1:A3" }),
-      25000
+    const r = await sh().spreadsheets.values.get(
+      { spreadsheetId: SHEET_ID, range: "'Registros'!A1:A3" },
+      GAXIOS_OPTS
     );
     res.json({ ok: true, ms: Date.now()-t0, values: r.data.values });
   } catch (err) {
@@ -258,7 +257,7 @@ app.post('/api/migrar/executar', async (req, res) => {
     await sh().spreadsheets.values.append({
       spreadsheetId: SHEET_ID, range:`'${ABA_REG}'!A1`,
       valueInputOption:'RAW', requestBody:{ values:novas },
-    });
+    }, GAXIOS_OPTS);
     res.json({ sucesso:true, migrados:novas.length, amostra:novas[0] });
   } catch (err) { res.status(500).json({ erro:err.message }); }
 });
@@ -289,7 +288,7 @@ app.post('/api/registros', async (req, res) => {
       requestBody:{ values:[[id,data,mergulhador,String(aquario||''),sistema||'',servico||'',
                              horaEntrada||'',horaSaida||'',minutos,status,
                              motivoPausa||observacoes||'']] },
-    });
+    }, GAXIOS_OPTS);
     res.json({ sucesso:true, id, minutos });
   } catch (err) { res.status(500).json({ erro:err.message }); }
 });
@@ -312,7 +311,7 @@ app.post('/api/registros/lote', async (req, res) => {
     await sh().spreadsheets.values.append({
       spreadsheetId: SHEET_ID, range:`'${ABA_REG}'!A1`,
       valueInputOption:'RAW', requestBody:{ values:linhas },
-    });
+    }, GAXIOS_OPTS);
     res.json({ sucesso:true, quantidade:linhas.length });
   } catch (err) { res.status(500).json({ erro:err.message }); }
 });
@@ -403,7 +402,7 @@ app.delete('/api/registros/:id', async (req, res) => {
     if (rowIdx < 0) return res.status(404).json({ erro: 'Registro não encontrado' });
     const rowNumber = rowIdx + 2; // linha real na planilha (1-indexed, +1 cabeçalho)
 
-    const meta = await sh().spreadsheets.get({ spreadsheetId: SHEET_ID });
+    const meta = await sh().spreadsheets.get({ spreadsheetId: SHEET_ID }, GAXIOS_OPTS);
     const sheet = meta.data.sheets.find(s => s.properties.title === ABA_REG);
     if (!sheet) return res.status(404).json({ erro: 'Aba não encontrada' });
 
@@ -413,7 +412,7 @@ app.delete('/api/registros/:id', async (req, res) => {
         range: { sheetId: sheet.properties.sheetId, dimension: 'ROWS',
                  startIndex: rowNumber - 1, endIndex: rowNumber }
       }}]}
-    });
+    }, GAXIOS_OPTS);
     res.json({ sucesso: true });
   } catch (err) { res.status(500).json({ erro: err.message }); }
 });
@@ -428,18 +427,18 @@ let _timerReadPending = false;
 
 async function garantirAbaTimers() {
   if (_timerAbaOk) return;
-  const meta = await sh().spreadsheets.get({ spreadsheetId: SHEET_ID });
+  const meta = await sh().spreadsheets.get({ spreadsheetId: SHEET_ID }, GAXIOS_OPTS);
   const abas = meta.data.sheets.map(s => s.properties.title);
   if (!abas.includes(ABA_TIMERS)) {
     await sh().spreadsheets.batchUpdate({
       spreadsheetId: SHEET_ID,
       requestBody: { requests: [{ addSheet: { properties: { title: ABA_TIMERS } } }] },
-    });
+    }, GAXIOS_OPTS);
     await sh().spreadsheets.values.update({
       spreadsheetId: SHEET_ID, range: `'${ABA_TIMERS}'!A1`,
       valueInputOption: 'RAW',
       requestBody: { values: [['Mergulhador','InicioMs','HoraEntrada','Grupo','Servico']] },
-    });
+    }, GAXIOS_OPTS);
   }
   _timerAbaOk = true;
 }
@@ -474,12 +473,12 @@ async function salvarTimerSheets(merg, dados) {
     await sh().spreadsheets.values.update({
       spreadsheetId: SHEET_ID, range: `'${ABA_TIMERS}'!A${row}:E${row}`,
       valueInputOption: 'RAW', requestBody: { values: vals },
-    });
+    }, GAXIOS_OPTS);
   } else {
     await sh().spreadsheets.values.append({
       spreadsheetId: SHEET_ID, range: `'${ABA_TIMERS}'!A1`,
       valueInputOption: 'RAW', requestBody: { values: vals },
-    });
+    }, GAXIOS_OPTS);
   }
   _timerCache[merg] = dados;
   _timerCacheTs = Date.now();
@@ -490,7 +489,7 @@ async function removerTimerSheets(merg) {
   const rowIdx = linhas.findIndex(l => l[0] === merg);
   if (rowIdx < 0) { delete _timerCache[merg]; return; }
   const rowNumber = rowIdx + 2;
-  const meta  = await sh().spreadsheets.get({ spreadsheetId: SHEET_ID });
+  const meta  = await sh().spreadsheets.get({ spreadsheetId: SHEET_ID }, GAXIOS_OPTS);
   const sheet = meta.data.sheets.find(s => s.properties.title === ABA_TIMERS);
   await sh().spreadsheets.batchUpdate({
     spreadsheetId: SHEET_ID,
@@ -498,7 +497,7 @@ async function removerTimerSheets(merg) {
       range: { sheetId: sheet.properties.sheetId, dimension: 'ROWS',
                startIndex: rowNumber - 1, endIndex: rowNumber }
     }}] },
-  });
+  }, GAXIOS_OPTS);
   delete _timerCache[merg];
   _timerCacheTs = Date.now();
 }
